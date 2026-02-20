@@ -1,110 +1,64 @@
-# Sistema IoT de Dispensadores de Alimento para Ganado
+# 🌾 LeGrange IoT 
 
-## Descripción del proyecto
-
-Este proyecto implementa una aplicación web orientada a la simulación, control y monitoreo de dispositivos IoT aplicados al sector agropecuario. La solución representa un sistema de dispensadores automáticos de alimento para ganado, específicamente para zacate, alfalfa y grano.
-
-La aplicación permite simular el funcionamiento de los dispositivos, registrar eventos en una API REST y visualizar información histórica y en tiempo casi real mediante gráficas y tablas, siguiendo principios básicos de una arquitectura IoT.
+**Sistema centralizado de monitoreo, control de inventarios y auditoría automatizada para la gestión inteligente de alimento en granjas de engorda LeGrange.**
 
 ---
 
-## Características principales
+## 📖 Acerca del Proyecto
 
-- Simulación de tres dispositivos IoT:
-  - Dispensador de zacate
-  - Dispensador de alfalfa
-  - Dispensador de grano
-- Pestaña de **Control** con:
-  - Estado del dispensador (apagado, dispensando, error)
-  - Nivel de alimento simulado
-  - Ingreso de peso a dispensar
-  - Simulación de errores por falta de alimento
-  - Registro de eventos en la API
-- Pestaña de **Monitoreo** con:
-  - Selección de dispensador
-  - Gráficas de estado y peso a lo largo del tiempo
-  - Tabla con los últimos 10 eventos registrados
-  - Refresco automático cada 2 segundos
-- Comunicación asíncrona usando Fetch y Async/Await
-- Interfaz moderna desarrollada con Bootstrap
+En la ganadería de engorda, la precisión en la nutrición define la rentabilidad del negocio. **LeGrange** es una aplicación web basada en el Internet de las Cosas (IoT) diseñada para resolver la distribución exacta de proteína y carbohidratos, automatizando el proceso físico de pesado de alimento y dispensando gramajes exactos a botes de servicio mediante control remoto.
 
----
+Más allá de ser un controlador de hardware, LeGrange actúa como un estricto **sistema de auditoría y control de inventarios**. A través de telemetría constante, la aplicación es capaz de interpretar el peso de los silos en tiempo real para detectar inteligentemente eventos físicos no registrados por el software, como rellenados de silo o sustracciones no autorizadas (posibles robos/mermas).
 
-## Tecnologías utilizadas
+## ✨ Características Principales (Módulos)
 
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- Bootstrap 5
-- Fetch API con Async/Await
-- MockAPI (API REST simulada)
-- Git y GitHub para control de versiones
+El sistema se divide en tres apartados principales, accesibles desde una interfaz moderna e intuitiva:
 
----
+* **🛠️ Administración:** Gestión de la infraestructura de dispensadores físicos. Permite registrar nuevos silos, configurar capacidades máximas (para el cálculo de porcentajes), editar descripciones y establecer metadatos como los horarios de alimentación esperados.
+* **🎛️ Controloperativo:** Panel de mando a distancia. Muestra el estado en tiempo real (conectividad y nivel de inventario) mediante alertas visuales por colores (Óptimo, Precaución, Crítico). Permite al operador enviar la instrucción de dispensado con el peso exacto deseado, validando previamente que el silo cuente con el alimento suficiente.
+* **📊 Monitoreo y analítica:** Motor de auditoría visual. Procesa la telemetría histórica mediante gráficas dinámicas (flujo de salidas y evolución del contenido) y una tabla de registros, actualizándose cada 2 segundos. 
 
-## Estructura del proyecto
+## 🧠 Lógica de negocio y estados (API)
 
-/
-├── index.html
-├── css/
-│ └── styles.css
-├── js/
-│ ├── api.js
-│ ├── control.js
-│ └── monitor.js
-└── README.md
+Para garantizar la integridad de los datos sin saturar el servidor, la arquitectura de base de datos (MockAPI) se divide en dos capas que interactúan bajo los siguientes códigos de estado:
 
+**Tabla Maestra (`DISPENSADOR_IOT`) - *Tiempo Real***
+Mantiene la "fotografía" actual del equipo para habilitar/bloquear el frontend.
+* `0`: Apagado / Fuera de línea.
+* `1`: En espera / Listo para operar.
+* `2`: Ocupado / Dispensando alimento.
+* `3`: Error (Ej. Hardware atascado o intento de dispensar más alimento del disponible).
 
----
+**Tabla Histórica (`DISPENSED_IOT`) - *Auditoría de Eventos***
+Registra las transacciones y eventos físicos detectados mediante la validación del peso para nutrir las gráficas.
+* `Código 2`: Dispensado normal autorizado por la aplicación.
+* `Código 4`: Evento de Rellenado (El sistema detecta un aumento de peso repentino).
+* `Código 5`: Sustracción Manual / Merma (El sistema detecta una caída de peso sin orden de dispensado previa).
 
-## Funcionamiento general
+## 🚀 Tecnologías Utilizadas
 
-### Control
+* **Frontend:** HTML5, CSS3, JavaScript (Vanilla JS modularizado).
+* **Framework de diseño:** Bootstrap 5.3 & Bootstrap Icons.
+* **Visualización de datos:** Chart.js (Gráficas renderizadas en Canvas).
+* **Alertas y UI:** SweetAlert2.
+* **Backend/API:** MockAPI (RESTful API para simulación de base de datos y telemetría).
 
-La pestaña de control simula que los dispositivos IoT están conectados físicamente. Cada dispensador cuenta con un peso disponible generado de forma aleatoria (entre 0 y 40,000 gramos). Al activar un dispensador:
+## 💻 Instalación y uso
 
-- El estado cambia a “Dispensando” durante 4 segundos.
-- Se valida si el peso solicitado es menor o igual al peso disponible.
-- Si la validación falla, el dispositivo entra en estado de error.
-- Se registra un evento en la API con la información correspondiente.
+Dado que es una aplicación web basada en tecnologías Frontend con consumo de API REST externa, no requiere instalación de dependencias locales complejas.
 
-### Monitoreo
-
-La pestaña de monitoreo consume datos reales desde la API REST y permite:
-
-- Visualizar gráficas basadas en el estado y el peso del dispensador.
-- Consultar el historial reciente de eventos.
-- Actualizar la información automáticamente cada 2 segundos.
+1. Clonar el repositorio o descargar la carpeta del proyecto.
+2. Abrir el archivo `index.html` directamente en cualquier navegador web moderno (Chrome, Edge, Firefox).
+3. *(Opcional)* Para una mejor experiencia de desarrollo, se recomienda ejecutar a través de **Live Server** en Visual Studio Code.
 
 ---
 
-## Reglas lógicas del sistema
-
-- Estados del dispensador:
-  - 1: Apagado
-  - 2: Dispensando
-  - 3: Error
-- Niveles de alimento:
-  - Lleno: 40,000 g
-  - Medio: 20,000 g
-  - Vacío: menos de 5,000 g
-- No se permite dispensar un peso mayor al disponible.
-- Cada activación genera un registro con fecha y hora local.
-
----
+**Autor:** 👩‍💻 **Aquetxali Barrera Sansabas** 🎓 Ing. Sistemas Computacionales - TecNM Pachuca  
+📧 l22550039@pachuca.tecnm.mx
 
 ## Alcances y limitaciones
 
 Este proyecto es una simulación académica. No se integra hardware real, sensores físicos ni protocolos IoT específicos como MQTT. Sin embargo, la arquitectura y la lógica implementadas permiten una futura escalabilidad hacia un entorno productivo.
-
----
-
-## Autor
-
-Proyecto desarrollado como práctica académica para la asignatura de Introducción al Internet de las Cosas.
-
-Ing. Sistemas Computacionales
-Aquetxali Barrera Sansabas 22550039
 
 ---
 
