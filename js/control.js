@@ -12,6 +12,7 @@ async function loadControlPanel() {
     }
 
     dispensadores.forEach(disp => {
+
         // Calcular porcentaje de llenado para la barra
         let porcentaje = (disp.weight / disp.maxWeight) * 100;
         porcentaje = Math.min(Math.max(porcentaje, 0), 100); // Mantener entre 0 y 100
@@ -22,22 +23,26 @@ async function loadControlPanel() {
         if (porcentaje <= 50 && porcentaje > 20) barColor = 'bg-warning';
         if (porcentaje <= 20) {
             barColor = 'bg-danger';
-            alertMsg = '<span class="text-danger fw-bold d-block mb-2">⚠️ Nivel Crítico: Requiere Rellenado</span>';
+            alertMsg = '<span class="text-danger fw-bold d-block mb-3">⚠️ Nivel crítico: Requiere rellenado</span>';
         }
 
         // Estado del interruptor y etiquetas
-        const isChecked = disp.status ? 'checked' : '';
-        const statusLabel = disp.status ? 'Encendido (Online)' : 'Apagado (Offline)';
-        const btnDisabled = (!disp.status || disp.statusCode !== 1) ? 'disabled' : ''; // Bloquear si está apagado o no está "Listo"
+        const isOnline = disp.status === true || disp.status === 'true';
+        const isChecked = isOnline ? 'checked' : '';
+        const btnDisabled = (!isOnline || disp.statusCode !== 1) ? 'disabled' : ''; // Bloquear si está apagado o no está "Listo"
 
-        // Mensajes de estado operativo (MUCHO MÁS VISIBLES)
-        let operativoMsg = '<div class="alert alert-success text-center py-2 mb-3 fw-bold">✅ Listo para operar</div>';
-
-        if (disp.statusCode === 2) {
-            operativoMsg = '<div class="alert alert-primary text-center py-3 mb-3 fw-bold fs-5 shadow-sm border border-primary">⏳ Dispensando en curso...</div>';
-        }
-        if (disp.statusCode === 3) {
-            operativoMsg = '<div class="alert alert-danger text-center py-2 mb-3 fw-bold fs-5 shadow-sm border border-danger">❌ Error: Alimento insuficiente</div>';
+        // Definir variables dinámicas para el diseño del estado
+        const colorBadge = isOnline ? 'bg-success' : 'bg-danger';
+        const textoEstado = isOnline ? 'En línea' : 'Apagado';
+        
+        // Mensajes de estado operativo específicos (Ocultos por defecto si no es necesario)
+        let operativoMsg = ''; 
+        if (isOnline) {
+            if (disp.statusCode === 2) {
+                operativoMsg = '<div class="alert alert-primary text-center py-2 mb-3 fw-bold shadow-sm border border-primary">⏳ Dispensado en curso...</div>';
+            } else if (disp.statusCode === 3) {
+                operativoMsg = '<div class="alert alert-danger text-center py-2 mb-3 fw-bold shadow-sm border border-danger">❌ Error: Alimento insuficiente</div>';
+            }
         }
 
         const cardHTML = `
@@ -45,19 +50,22 @@ async function loadControlPanel() {
                 <div class="card card-iot h-100 border-0 shadow-sm">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">${disp.deviceName}</h5>
-                        <div class="form-check form-switch">
+                        <div class="form-check form-switch mb-0">
                             <input class="form-check-input" type="checkbox" id="switch-${disp.id}" ${isChecked} onchange="toggleDevice('${disp.id}', this.checked)">
                         </div>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small mb-1">Estado Físico: <strong>${statusLabel}</strong></p>
-                        ${operativoMsg}
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="text-muted fw-bold">Estado del equipo:</span>
+                            <span class="badge ${colorBadge} px-3 py-2 fs-6">${textoEstado}</span>
+                        </div>
                         
+                        ${operativoMsg}
                         ${alertMsg}
                         
                         <div class="d-flex justify-content-between mb-1">
-                            <span class="small fw-bold">Nivel de Silo</span>
-                            <span class="small fw-bold">${disp.weight.toFixed(2)} / ${disp.maxWeight} kg</span>
+                            <span class="small fw-bold">Nivel de silo</span>
+                            <span class="small fw-bold text-muted">${disp.weight.toFixed(2)} / ${disp.maxWeight} kg</span>
                         </div>
                         <div class="progress mb-4" style="height: 20px;">
                             <div class="progress-bar ${barColor} progress-bar-striped" role="progressbar" style="width: ${porcentaje}%">
@@ -70,7 +78,7 @@ async function loadControlPanel() {
                             <span class="input-group-text">kg</span>
                         </div>
                         <button class="btn btn-primary w-100" onclick="dispensarAlimento('${disp.id}', ${disp.weight})" ${btnDisabled}>
-                            Dispensar a Bote
+                            Dispensar a bote
                         </button>
                     </div>
                 </div>
@@ -151,8 +159,6 @@ async function dispensarAlimento(id, currentWeight) {
 loadControlPanel();
 
 // --- SIMULACIÓN DE CAMBIO ALEATORIO (Cada minuto) ---
-// Representa el consumo natural o actualización del microcontrolador
-// --- SIMULACIÓN DE CAMBIO ALEATORIO (Cada minuto) ---
 // Representa lecturas drásticas del microcontrolador (Rellenados o Sustracciones)
 setInterval(async () => {
     // Solo ejecutamos si la pestaña de control está visible para no saturar la API
@@ -160,8 +166,9 @@ setInterval(async () => {
         const dispensadores = await getDispensadores();
         
         for (const disp of dispensadores) {
-            // Solo afectar si está encendido y listo
-            if (disp.status === true && disp.statusCode === 1) {
+            // Solo afectar si está encendido y listo (status en boolean o string por si acaso)
+            const isOnline = disp.status === true || disp.status === 'true';
+            if (isOnline && disp.statusCode === 1) {
                 
                 // 1. Generar un nuevo peso aleatorio entre 0 y el MÁXIMO del silo
                 const nuevoPeso = parseFloat((Math.random() * disp.maxWeight).toFixed(2));
@@ -197,4 +204,4 @@ setInterval(async () => {
         }
         loadControlPanel(); // Refrescar UI para ver el cambio de golpe
     }
-}, 600000); // 600,000 milisegundos = 10 minutos (60,000 miliseguendos = 1 minuto)
+}, 600000); // 600,000 milisegundos = 10 minutos

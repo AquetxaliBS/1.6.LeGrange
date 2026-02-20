@@ -34,7 +34,7 @@ monitoreoContent.innerHTML = `
         </div>
         <div class="card shadow-sm border-0">
             <div class="card-body">
-                <h5 class="text-center fw-bold text-secondary mb-4">Comparativa de niveles vista global</h5>
+                <h5 class="text-center fw-bold text-secondary mb-4">Vista global actual de contenido de silos </h5>
                 <div style="position: relative; height: 300px; width: 100%;">
                     <canvas id="chart-global"></canvas>
                 </div>
@@ -128,7 +128,7 @@ async function cargarCombobox() {
     dispensadores.forEach(disp => {
         const option = document.createElement('option');
         option.value = disp.id;
-        option.textContent = `Silo #${disp.id} - ${disp.deviceName}`;
+        option.textContent = `${disp.deviceName}`;
         select.appendChild(option);
     });
 
@@ -165,7 +165,7 @@ function iniciarMonitoreo() {
 }
 
 // ==========================================
-// LÓGICA DEL DASHBOARD GLOBAL CORREGIDA
+// LÓGICA DEL DASHBOARD GLOBAL 
 // ==========================================
 async function actualizarDashboardGlobal() {
     const dispensadores = await getDispensadores();
@@ -176,7 +176,7 @@ async function actualizarDashboardGlobal() {
     const nivelesSilos = [];
     const coloresSilos = [];
 
-    // Ahora iteramos buscando el historial de CADA silo para tener su peso real
+    // Iteramos buscando el historial de CADA silo para tener su peso real
     for (let disp of dispensadores) {
         // Silos activos
         const isRunning = disp.status === true || disp.status === 'true';
@@ -191,7 +191,7 @@ async function actualizarDashboardGlobal() {
         nombresSilos.push(disp.deviceName || `Silo ${disp.id}`);
         nivelesSilos.push(nivel);
 
-        // CORRECCIÓN 2: Capacidad dinámica. Busca 'capacity', 'capacidad' o 'maxWeight'. Si no existe, usa 1000.
+        // Capacidad dinámica. 
         let capacidad = parseFloat(disp.capacity) || parseFloat(disp.capacidad) || parseFloat(disp.maxWeight) || 1000;
         
         let porcentaje = (nivel / capacidad) * 100;
@@ -224,7 +224,7 @@ async function actualizarDashboardGlobal() {
             options: {
                 maintainAspectRatio: false,
                 animation: false,
-                scales: { y: { beginAtZero: true } }, // Ya no forzamos un máximo fijo en la escala Y
+                scales: { y: { beginAtZero: true } },
                 plugins: { legend: { display: false } }
             }
         });
@@ -232,12 +232,12 @@ async function actualizarDashboardGlobal() {
 }
 
 // ==========================================
-// LÓGICA DEL DASHBOARD ESPECÍFICO CORREGIDA
+// LÓGICA DEL DASHBOARD ESPECÍFICO 
 // ==========================================
 async function actualizarDashboard(dispensadorId) {
     const dispensadores = await getDispensadores();
     
-    // CORRECCIÓN 3: Comparar convirtiendo a texto para evitar fallos de ID numérico vs string
+    // Comparar convirtiendo a texto para evitar fallos de ID numérico vs string
     const siloActual = dispensadores.find(d => d.id.toString() === dispensadorId.toString());
     
     // Verificar status del silo
@@ -251,7 +251,7 @@ async function actualizarDashboard(dispensadorId) {
     }
 
     // Calcular capacidad dinámica
-    let capacidadMaxima = 1000; // Por defecto
+    let capacidadMaxima = 1000;
     if (siloActual) {
         capacidadMaxima = parseFloat(siloActual.capacity) || parseFloat(siloActual.capacidad) || parseFloat(siloActual.maxWeight) || 1000;
     }
@@ -313,7 +313,7 @@ async function actualizarDashboard(dispensadorId) {
             if (reg.StatusCode === 2) { ev = 'Dispensado'; bdg = 'bg-primary'; }
             else if (reg.StatusCode === 3) { ev = 'Error'; bdg = 'bg-danger'; }
             else if (reg.StatusCode === 4) { ev = 'Rellenado'; bdg = 'bg-success'; }
-            else if (reg.StatusCode === 5) { ev = 'Consumo'; bdg = 'bg-warning text-dark'; }
+            else if (reg.StatusCode === 5) { ev = 'Sustracción manual'; bdg = 'bg-warning text-dark'; }
 
             let pAnt = (reg.StatusCode === 2 || reg.StatusCode === 5) ? pa + c : (reg.StatusCode === 4 ? pa - c : pa);
             

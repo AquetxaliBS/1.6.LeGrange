@@ -20,3 +20,5 @@
 .card-iot:hover {
     transform: translateY(-5px);
 }
+
+.hover-primary:hover { color: #d4b9f6 !important; transition: 0.3s; }
