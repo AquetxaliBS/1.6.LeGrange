@@ -3,80 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeGrange</title>
+    <title>LeGrange IoT</title>
     <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    
+    <style>
+        /* Efecto de elevación para las tarjetas del Home */
+        .hover-zoom {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-zoom:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+        }
+        .hover-primary:hover { color: #0d6efd !important; transition: 0.3s; }
+    </style>
 </head>
+
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-agritech">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-agritech shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">🌾 LeGrange IoT</a>
+            <a class="navbar-brand fw-bold" href="#" onclick="showSection('home')">🌾 LeGrange IoT</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#" onclick="showSection('admin')">Administración</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('control')">Control</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('monitoreo')">Monitoreo</a></li>
+                    <li class="nav-item"><a class="nav-link active" id="nav-home" href="#" onclick="showSection('home')">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-admin" href="#" onclick="showSection('admin')">Administración</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-control" href="#" onclick="showSection('control')">Control</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-monitoreo" href="#" onclick="showSection('monitoreo')">Monitoreo</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4 mb-5">
         
-        <section id="section-admin" class="view-section">
-            <h2 class="mb-4">Gestión de dispensadores (Silos)</h2>
+        <section id="section-home" class="view-section">
+            <div class="p-5 mb-5 text-white rounded-4 shadow-lg text-center" 
+                 style="background: linear-gradient(rgba(33, 37, 41, 0.85), rgba(33, 37, 41, 0.85)), url('https://images.unsplash.com/photo-1586771107445-d3af9e170c66?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;">
+                <div class="container-fluid py-4">
+                    <h1 class="display-4 fw-bold text-success mb-3">
+                        <i class="bi bi-cpu-fill me-2"></i>LeGrange IoT
+                    </h1>
+                    <p class="fs-4 mx-auto text-light" style="max-width: 800px;">
+                        Sistema centralizado de monitoreo y control automatizado para la gestión inteligente de alimento en granjas.
+                    </p>
+                    <hr class="border-success my-4 mx-auto" style="width: 100px; border-width: 3px; opacity: 1;">
+                    <p class="lead text-white-50">Selecciona un módulo para comenzar</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm text-center feature-card hover-zoom">
+                        <div class="card-body p-4 text-primary">
+                            <i class="bi bi-display fs-1 mb-3 d-block"></i>
+                            <h3 class="card-title text-dark fw-bold">Monitoreo</h3>
+                            <p class="card-text text-muted mb-4">
+                                Visualiza en tiempo real el nivel de llenado de todos los silos, su estado de conexión y métricas clave.
+                            </p>
+                            <button class="btn btn-outline-primary w-100 fw-bold rounded-pill" onclick="showSection('monitoreo')">
+                                Ir a Monitoreo <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm text-center feature-card hover-zoom">
+                        <div class="card-body p-4 text-warning">
+                            <i class="bi bi-sliders fs-1 mb-3 d-block"></i>
+                            <h3 class="card-title text-dark fw-bold">Control IoT</h3>
+                            <p class="card-text text-muted mb-4">
+                                Toma el mando a distancia. Enciende o apaga equipos y dispensa alimento con precisión milimétrica.
+                            </p>
+                            <button class="btn btn-outline-warning w-100 fw-bold rounded-pill text-dark border-2" onclick="showSection('control')">
+                                Ir a Control <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm text-center feature-card hover-zoom">
+                        <div class="card-body p-4 text-success">
+                            <i class="bi bi-database-fill-gear fs-1 mb-3 d-block"></i>
+                            <h3 class="card-title text-dark fw-bold">Administración</h3>
+                            <p class="card-text text-muted mb-4">
+                                Gestiona tu infraestructura. Registra nuevos silos, actualiza capacidades y elimina equipos.
+                            </p>
+                            <button class="btn btn-outline-success w-100 fw-bold rounded-pill" onclick="showSection('admin')">
+                                Ir a Administración <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-admin" class="view-section d-none">
+            <h2 class="mb-4 fw-bold">Gestión de dispensadores (Silos)</h2>
             <div id="admin-content"></div>
         </section>
 
         <section id="section-control" class="view-section d-none">
-            <h2 class="mb-4">Control operativo de suministro</h2>
+            <h2 class="mb-4 fw-bold">Control operativo de suministro</h2>
             <div id="control-content" class="row"></div>
         </section>
 
         <section id="section-monitoreo" class="view-section d-none">
-            <h2 class="mb-4">Monitoreo y analítica</h2>
+            <h2 class="mb-4 fw-bold">Monitoreo y analítica</h2>
             <div id="monitoreo-content"></div>
         </section>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <script src="js/api.js"></script>
-    <script>
-        // index.html - Lógica para cambiar de pestañas
-    function showSection(sectionId) {
-        // Ocultar todas las secciones y mostrar la seleccionada
-        document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('d-none'));
-        document.getElementById(`section-${sectionId}`).classList.remove('d-none');
-    
-        // Cambiar clase activa en el menú
-        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-        event.target.classList.add('active');
-
-        // Recargar los datos desde la API cada vez que el usuario entra a la pestaña
-        if (sectionId === 'admin') loadTable();
-        if (sectionId === 'control') loadControlPanel();
-        if (sectionId === 'monitoreo') cargarCombobox(); 
-    }
-    </script>
-    <script src="js/admin.js"></script>
-    <script src="js/control.js"></script>
-    <script src="js/monitoreo.js"></script>
-</body>
-<footer class="bg-dark text-white pt-4 pb-3 mt-auto shadow-lg">
+    <footer class="bg-dark text-white pt-4 pb-3 mt-auto shadow-lg">
         <div class="container text-center text-md-start">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <h5 class="fw-bold mb-1">Aquetxali Barrera Sansabas</h5>
+                    <h5 class="fw-bold mb-1 hover-but">Aquetxali Barrera Sansabas</h5>
                     <p class="mb-1 text-light">Ing. Sistemas Computacionales</p>
                     <p class="mb-0 text-white-50">
                         <i class="bi bi-envelope-at-fill me-2"></i> l22550039@pachuca.tecnm.mx
@@ -85,10 +135,10 @@
                 <div class="col-md-6 text-md-end">
                     <h6 class="fw-bold text-uppercase text-white-50 mb-3">Conecta conmigo</h6>
                     <a href="https://www.linkedin.com/in/aquetxali-barrera-sansabas-5b1767224/" target="_blank" class="text-white me-3 text-decoration-none">
-                        <i class="bi bi-linkedin fs-3 hover-primary"></i>
+                        <i class="bi bi-linkedin fs-3 hover-but"></i>
                     </a>
                     <a href="https://github.com/AquetxaliBS?tab=repositories" target="_blank" class="text-white text-decoration-none">
-                        <i class="bi bi-github fs-3 hover-primary"></i>
+                        <i class="bi bi-github fs-3 hover-but"></i>
                     </a>
                 </div>
             </div>
@@ -99,4 +149,42 @@
             </div>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="js/api.js"></script>
+    
+    <script>
+        // Lógica para cambiar de pestañas
+        function showSection(sectionId) {
+            // 1. Ocultar todas las secciones
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('d-none'));
+            
+            // 2. Mostrar la sección seleccionada
+            document.getElementById(`section-${sectionId}`).classList.remove('d-none');
+        
+            // 3. Cambiar clase activa en el menú de navegación
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const activeLink = document.getElementById(`nav-${sectionId}`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // 4. Recargar los datos desde la API según la pestaña
+            // Añadí 'typeof' para evitar errores si los archivos JS aún no se han cargado por completo
+            if (sectionId === 'admin' && typeof loadTable === 'function') loadTable();
+            if (sectionId === 'control' && typeof loadControlPanel === 'function') loadControlPanel();
+            if (sectionId === 'monitoreo' && typeof cargarCombobox === 'function') cargarCombobox(); 
+            
+            // 5. Scroll automático al inicio (útil si estás hasta abajo en otra pestaña)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    
+    <script src="js/admin.js"></script>
+    <script src="js/control.js"></script>
+    <script src="js/monitoreo.js"></script>
+</body>
 </html>

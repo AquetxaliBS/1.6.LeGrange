@@ -13,7 +13,7 @@
 .card-iot {
     border: none;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease-in-out;
 }
 
@@ -21,4 +21,13 @@
     transform: translateY(-5px);
 }
 
-.hover-primary:hover { color: #d4b9f6 !important; transition: 0.3s; }
+.hover-but:hover { color: #d4b9f6 !important; transition: 0.3s; }
+
+/* Efecto de elevación al pasar el mouse en las tarjetas del Home */
+.hover-zoom {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-zoom:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+}
