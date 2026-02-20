@@ -168,6 +168,7 @@ function iniciarMonitoreo() {
 // LÓGICA DEL DASHBOARD GLOBAL 
 // ==========================================
 async function actualizarDashboardGlobal() {
+    // 1. Obtenemos TODOS los dispensadores registrados en la tabla maestra
     const dispensadores = await getDispensadores();
     
     let totalAlimento = 0;
@@ -176,33 +177,33 @@ async function actualizarDashboardGlobal() {
     const nivelesSilos = [];
     const coloresSilos = [];
 
-    // Iteramos buscando el historial de CADA silo para tener su peso real
     for (let disp of dispensadores) {
-        // Silos activos
+        // ¿Está encendido el silo?
         const isRunning = disp.status === true || disp.status === 'true';
         if (isRunning) silosActivos++;
         
-        // Buscar su historial para saber su nivel actual
-        const historial = await getHistorial(disp.id);
-        const ultimoRegistro = historial.length > 0 ? historial[historial.length - 1] : null;
-        let nivel = ultimoRegistro ? parseFloat(ultimoRegistro.currentWeight) || 0 : 0;
+        // 2. CORRECCIÓN: Tomamos el peso y capacidad directamente del dispensador,
+        // sin importar si tiene historial de operaciones o no.
+        let nivel = parseFloat(disp.weight) || 0; 
+        let capacidad = parseFloat(disp.maxWeight) || parseFloat(disp.capacity) || 1000;
         
         totalAlimento += nivel;
         nombresSilos.push(disp.deviceName || `Silo ${disp.id}`);
         nivelesSilos.push(nivel);
 
-        // Capacidad dinámica. 
-        let capacidad = parseFloat(disp.capacity) || parseFloat(disp.capacidad) || parseFloat(disp.maxWeight) || 1000;
-        
+        // 3. Calculamos el porcentaje para definir el color de la gráfica
         let porcentaje = (nivel / capacidad) * 100;
-        if (porcentaje < 20) coloresSilos.push('rgba(220, 53, 69, 0.8)');
-        else if (porcentaje < 50) coloresSilos.push('rgba(255, 193, 7, 0.8)');
-        else coloresSilos.push('rgba(25, 135, 84, 0.8)');
+        
+        if (porcentaje < 20) coloresSilos.push('rgba(220, 53, 69, 0.8)');      // Rojo (Crítico)
+        else if (porcentaje < 50) coloresSilos.push('rgba(255, 193, 7, 0.8)'); // Amarillo (Advertencia)
+        else coloresSilos.push('rgba(25, 135, 84, 0.8)');                      // Verde (Óptimo)
     }
 
+    // 4. Actualizamos las tarjetas numéricas de arriba
     document.getElementById('global-silos-activos').textContent = silosActivos;
     document.getElementById('global-alimento-total').textContent = totalAlimento.toFixed(2);
 
+    // 5. Actualizamos o creamos la gráfica de barras global
     if (chartGlobal) {
         chartGlobal.data.labels = nombresSilos;
         chartGlobal.data.datasets[0].data = nivelesSilos;
@@ -223,7 +224,7 @@ async function actualizarDashboardGlobal() {
             },
             options: {
                 maintainAspectRatio: false,
-                animation: false,
+                animation: false, // Desactivado para que el setInterval no parpadee
                 scales: { y: { beginAtZero: true } },
                 plugins: { legend: { display: false } }
             }
@@ -260,7 +261,8 @@ async function actualizarDashboard(dispensadorId) {
     const historialCompleto = await getHistorial(dispensadorId);
     const ultimos10 = historialCompleto.slice(-10);
 
-    let pesoActual = ultimos10.length > 0 ? parseFloat(ultimos10[ultimos10.length - 1].currentWeight) || 0 : 0;
+    // CORRECCIÓN: El peso actual se lee de la tabla maestra, no del historial
+    let pesoActual = siloActual ? (parseFloat(siloActual.weight) || 0) : 0;
     let porcentaje = (pesoActual / capacidadMaxima) * 100;
 
     document.getElementById('kpi-nivel').textContent = `${pesoActual} kg`;
